@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import * as XLSX from 'xlsx';
 
 interface SimpleExcelViewerProps {
@@ -12,13 +12,7 @@ const SimpleExcelViewer: React.FC<SimpleExcelViewerProps> = ({ file }) => {
   const [error, setError] = useState<string | null>(null);
   const [showFormulas, setShowFormulas] = useState(false);
 
-  useEffect(() => {
-    if (file) {
-      loadExcelFile(file);
-    }
-  }, [file]);
-
-  const loadExcelFile = async (file: File) => {
+  const loadExcelFile = useCallback(async (file: File) => {
     setIsLoading(true);
     setError(null);
 
@@ -119,7 +113,13 @@ const SimpleExcelViewer: React.FC<SimpleExcelViewerProps> = ({ file }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (file) {
+      loadExcelFile(file);
+    }
+  }, [file, loadExcelFile]);
 
   // Helper functions to extract formatting
   const getCellBackgroundColor = (cell: any) => {
